@@ -14,8 +14,8 @@ using json = nlohmann::json;
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-static const int GRID_ROWS = 10;
-static const int GRID_COLS = 10;
+static const int GRID_ROWS = 8;
+static const int GRID_COLS = 8;
 
 // ---------------------------------------------------------------------------
 // Utility helpers

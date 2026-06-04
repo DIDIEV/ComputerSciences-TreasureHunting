@@ -16,8 +16,8 @@ DATA_DIR = os.path.abspath(os.path.join(CURRENT_DIR, "..", "Data"))
 ENGINE_EXE = os.path.abspath(os.path.join(CURRENT_DIR, "..", "Engine", "Main.exe"))
 INPUT_PATH = os.path.join(DATA_DIR, "input.json")
 STATE_PATH = os.path.join(DATA_DIR, "state.json")
-DEFAULT_GRID_ROWS = 10
-DEFAULT_GRID_COLS = 10
+DEFAULT_GRID_ROWS = 8
+DEFAULT_GRID_COLS = 8
 
 def _load_json(path):
     if not os.path.exists(path):
@@ -262,7 +262,9 @@ def _convert_for_ui(state):
             }
             for t in state.get("treasures", [])
             if not t.get("collected", False)
-        ]
+        ],
+        "grid_rows": state.get("grid_rows", DEFAULT_GRID_ROWS),
+        "grid_cols": state.get("grid_cols", DEFAULT_GRID_COLS)
     }
 
 

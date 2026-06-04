@@ -24,10 +24,10 @@ pygame.init()
 
 # Viewport spatial definitions (Constraint: Matrix grid layout must be at least 8x8)
 CELL_SIZE = 60
-GRID_SIZE = 10
+DEFAULT_GRID_SIZE = 8
 HUD_WIDTH = 260
-WINDOW_WIDTH = (GRID_SIZE * CELL_SIZE) + HUD_WIDTH
-WINDOW_HEIGHT = GRID_SIZE * CELL_SIZE
+WINDOW_WIDTH = (DEFAULT_GRID_SIZE * CELL_SIZE) + HUD_WIDTH
+WINDOW_HEIGHT = DEFAULT_GRID_SIZE * CELL_SIZE
 
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Treasure Hunt Simulation - Python/C++ Interfacing")
@@ -41,15 +41,18 @@ COLOR_TREASURE = (234, 179, 8)  # Yellow-500 item circle representation
 COLOR_TEXT = (244, 244, 245)    # Zinc-100 high contrast layout text
 COLOR_HUD_BG = (39, 39, 42)     # Sidebar contrast container panel
 
-def draw_matrix_board():
+def draw_matrix_board(rows: int, cols: int):
     """
-    Renders the primary 8x8 orthogonal tracking matrix grid layout 
-    where algorithmic steps take place.
+    Renders the dynamic board grid layout using the current state dimensions.
     """
-    for x in range(0, GRID_SIZE * CELL_SIZE, CELL_SIZE):
-        for y in range(0, GRID_SIZE * CELL_SIZE, CELL_SIZE):
+    board_width = cols * CELL_SIZE
+    board_height = rows * CELL_SIZE
+
+    for x in range(0, board_width, CELL_SIZE):
+        for y in range(0, board_height, CELL_SIZE):
             cell_rect = pygame.Rect(x, y, CELL_SIZE, CELL_SIZE)
             pygame.draw.rect(screen, COLOR_GRID, cell_rect, 1)
+
 
 def draw_sidebar_hud(game_state, message=""):
     """
@@ -60,46 +63,49 @@ def draw_sidebar_hud(game_state, message=""):
     font_header = pygame.font.SysFont("Arial", 18, bold=True)
     font_small = pygame.font.SysFont("Arial", 13)
     
+    board_width = game_state.get("grid_cols", DEFAULT_GRID_SIZE) * CELL_SIZE
+    board_height = game_state.get("grid_rows", DEFAULT_GRID_SIZE) * CELL_SIZE
+
     # Render main background panel container
-    hud_rect = pygame.Rect(GRID_SIZE * CELL_SIZE, 0, HUD_WIDTH, WINDOW_HEIGHT)
+    hud_rect = pygame.Rect(board_width, 0, HUD_WIDTH, board_height)
     pygame.draw.rect(screen, COLOR_HUD_BG, hud_rect)
     
     # Title display
     title_surface = font_header.render("TREASURE HUNT (V7)", True, COLOR_TREASURE)
-    screen.blit(title_surface, (GRID_SIZE * CELL_SIZE + 20, 20))
+    screen.blit(title_surface, (board_width + 20, 20))
     
     # Active simulation data outputs
     pos_text = f"Agent Position: [{game_state['player_pos'][0]}, {game_state['player_pos'][1]}]"
     pos_surface = font_body.render(pos_text, True, COLOR_TEXT)
-    screen.blit(pos_surface, (GRID_SIZE * CELL_SIZE + 20, 60))
+    screen.blit(pos_surface, (board_width + 20, 60))
     
     score_text = f"Collected Score: {game_state['score']}"
     score_surface = font_body.render(score_text, True, COLOR_TEXT)
-    screen.blit(score_surface, (GRID_SIZE * CELL_SIZE + 20, 90))
+    screen.blit(score_surface, (board_width + 20, 90))
     
     items_text = f"Items Remaining: {len(game_state['treasures'])}"
     items_surface = font_body.render(items_text, True, COLOR_TEXT)
-    screen.blit(items_surface, (GRID_SIZE * CELL_SIZE + 20, 120))
+    screen.blit(items_surface, (board_width + 20, 120))
     
     # Controls reference text block
     controls_title = font_header.render("CONTROLS:", True, COLOR_TEXT)
-    screen.blit(controls_title, (GRID_SIZE * CELL_SIZE + 20, 180))
+    screen.blit(controls_title, (board_width + 20, 180))
     
     arrow_txt = font_small.render("- ARROW KEYS: Manual Step Move", True, COLOR_TEXT)
-    screen.blit(arrow_txt, (GRID_SIZE * CELL_SIZE + 20, 210))
+    screen.blit(arrow_txt, (board_width + 20, 210))
     
     greedy_txt = font_small.render("- 'G' KEY: Execute Greedy Target", True, COLOR_TREASURE)
-    screen.blit(greedy_txt, (GRID_SIZE * CELL_SIZE + 20, 235))
+    screen.blit(greedy_txt, (board_width + 20, 235))
     
     bt_txt = font_small.render("- 'B' KEY: Run Backtracking (Max 10)", True, COLOR_PLAYER)
-    screen.blit(bt_txt, (GRID_SIZE * CELL_SIZE + 20, 260))
+    screen.blit(bt_txt, (board_width + 20, 260))
 
     # Real-time algorithm logging monitor
     if message:
         log_title = font_header.render("ENGINE LOG:", True, COLOR_TREASURE)
-        screen.blit(log_title, (GRID_SIZE * CELL_SIZE + 20, 310))
+        screen.blit(log_title, (board_width + 20, 310))
         log_surface = font_small.render(message, True, COLOR_TEXT)
-        screen.blit(log_surface, (GRID_SIZE * CELL_SIZE + 20, 340))
+        screen.blit(log_surface, (board_width + 20, 340))
 
 
 # Application Entry Initialization
@@ -109,21 +115,33 @@ active_log_message = "System initialized."
 while application_active:
     # Set background baseline color state
     screen.fill(COLOR_BG)
-    draw_matrix_board()
     
     # 1. Pipeline Read Step: Query JSON Bridge interface data from disk
     current_game_state = Bridge.read_game_state()
+    board_rows = current_game_state.get("grid_rows", DEFAULT_GRID_SIZE)
+    board_cols = current_game_state.get("grid_cols", DEFAULT_GRID_SIZE)
+    board_width = board_cols * CELL_SIZE
+    board_height = board_rows * CELL_SIZE
+
+    if screen.get_size() != (board_width + HUD_WIDTH, board_height):
+        screen = pygame.display.set_mode((board_width + HUD_WIDTH, board_height))
+
+    draw_matrix_board(board_rows, board_cols)
     
     # 2. Render Board Entities: Render structural states fetched from memory representations
     # Drawing target treasure matrices elements
     for treasure in current_game_state["treasures"]:
         tx, ty = treasure["x"], treasure["y"]
+        if not (0 <= tx < board_cols and 0 <= ty < board_rows):
+            continue
         # Center-fit circles inside grid cells
         treasure_bounds = pygame.Rect(tx * CELL_SIZE + 15, ty * CELL_SIZE + 15, CELL_SIZE - 30, CELL_SIZE - 30)
         pygame.draw.ellipse(screen, COLOR_TREASURE, treasure_bounds)
         
     # Drawing active player agent positioning block
     px, py = current_game_state["player_pos"]
+    px = max(0, min(px, board_cols - 1))
+    py = max(0, min(py, board_rows - 1))
     player_bounds = pygame.Rect(px * CELL_SIZE + 10, py * CELL_SIZE + 10, CELL_SIZE - 20, CELL_SIZE - 20)
     pygame.draw.rect(screen, COLOR_PLAYER, player_bounds)
     
