@@ -46,11 +46,14 @@ COLOR_TREASURE_HIGH = (239, 68, 68)   # Red-500 high-value treasure
 COLOR_TEXT = (244, 244, 245)    # Zinc-100 high contrast layout text
 COLOR_HUD_BG = (39, 39, 42)     # Sidebar contrast container panel
 COLOR_TRAP = (220, 38, 38)     # Red-600 trap color
+COLOR_BACKTRACK_ROUTE = (16, 185, 129)
 
 # Trap spawn timing (use Bridge constant when available)
 TRAP_SPAWN_INTERVAL = getattr(Bridge, 'TRAP_SPAWN_INTERVAL', 20)
 _trap = None
 _last_trap_spawn = time.time()
+_current_backtracking_route = []
+BACKTRACKING_MAX_USES = 5
 
 
 def treasure_color_by_value(value: int):
@@ -109,6 +112,10 @@ def draw_sidebar_hud(game_state, message=""):
     traps_text = f"Traps Active: {len(game_state.get('traps', []))}"
     traps_surface = font_body.render(traps_text, True, COLOR_TRAP)
     screen.blit(traps_surface, (board_width + 20, 140))
+
+    backtracking_text = f"Backtracking left: {game_state.get('backtracking_remaining', BACKTRACKING_MAX_USES)}"
+    backtracking_surface = font_body.render(backtracking_text, True, COLOR_TEXT)
+    screen.blit(backtracking_surface, (board_width + 20, 160))
     
     # Controls reference text block
     controls_title = font_header.render("CONTROLS:", True, COLOR_TEXT)
@@ -120,7 +127,7 @@ def draw_sidebar_hud(game_state, message=""):
     greedy_txt = font_small.render("- 'G' KEY: Execute Greedy Target", True, COLOR_TREASURE_MEDIUM)
     screen.blit(greedy_txt, (board_width + 20, 235))
     
-    bt_txt = font_small.render("- 'B' KEY: Run Backtracking (Max 10)", True, COLOR_PLAYER)
+    bt_txt = font_small.render(f"- 'B' KEY: Run Backtracking (Max {BACKTRACKING_MAX_USES})", True, COLOR_PLAYER)
     screen.blit(bt_txt, (board_width + 20, 260))
 
     # Real-time algorithm logging monitor
@@ -165,6 +172,15 @@ while application_active:
     
     # 2. Render Board Entities: Render structural states fetched from memory representations
     # Drawing target treasure matrices elements
+    # Draw backtracking route overlay if available
+    for route_cell in _current_backtracking_route:
+        rx, ry = route_cell
+        if not (0 <= rx < board_cols and 0 <= ry < board_rows):
+            continue
+        route_rect = pygame.Rect(rx * CELL_SIZE + 22, ry * CELL_SIZE + 22, CELL_SIZE - 44, CELL_SIZE - 44)
+        pygame.draw.rect(screen, COLOR_BACKTRACK_ROUTE, route_rect, 2)
+        pygame.draw.circle(screen, COLOR_BACKTRACK_ROUTE, (rx * CELL_SIZE + CELL_SIZE // 2, ry * CELL_SIZE + CELL_SIZE // 2), 4)
+
     for treasure in current_game_state["treasures"]:
         tx, ty = treasure["x"], treasure["y"]
         if not (0 <= tx < board_cols and 0 <= ty < board_rows):
@@ -216,15 +232,19 @@ while application_active:
             if event.key == pygame.K_UP:
                 Bridge.save_user_action("MOVE", {"dir": "UP"})
                 active_log_message = "Manual action: Move UP"
+                _current_backtracking_route = []
             elif event.key == pygame.K_DOWN:
                 Bridge.save_user_action("MOVE", {"dir": "DOWN"})
                 active_log_message = "Manual action: Move DOWN"
+                _current_backtracking_route = []
             elif event.key == pygame.K_LEFT:
                 Bridge.save_user_action("MOVE", {"dir": "LEFT"})
                 active_log_message = "Manual action: Move LEFT"
+                _current_backtracking_route = []
             elif event.key == pygame.K_RIGHT:
                 Bridge.save_user_action("MOVE", {"dir": "RIGHT"})
                 active_log_message = "Manual action: Move RIGHT"
+                _current_backtracking_route = []
                 
             # Key 'G': Executes Greedy Optimization Method Search
             elif event.key == pygame.K_g:
@@ -242,27 +262,35 @@ while application_active:
                     })
                 else:
                     active_log_message = "Greedy: No items left"
+                _current_backtracking_route = []
                     
             # Key 'B': Executes Depth-Limited State Space Backtracking Search
             elif event.key == pygame.K_b:
-                step_budget_limit = 10  # Evaluates best paths up to 10 moves deep
-                search_result = plan_path_backtracking(
-                    start_pos=current_game_state["player_pos"],
-                    step_limit=step_budget_limit,
-                    item_list=current_game_state["treasures"]
-                )
-                
-                calculated_route = search_result["calculated_path"]
-                
-                if len(calculated_route) > 1:
-                    active_log_message = f"BT planned: {len(calculated_route)-1} steps"
-                    Bridge.save_user_action("RUN_BACKTRACKING", {
-                        "planned_path": calculated_route,
-                        "total_steps": len(calculated_route) - 1,
-                        "projected_yield": search_result["total_yield"]
-                    })
+                remaining_backtracking = current_game_state.get("backtracking_remaining", BACKTRACKING_MAX_USES)
+                if remaining_backtracking <= 0:
+                    active_log_message = "No backtracking uses left."
+                    _current_backtracking_route = []
                 else:
-                    active_log_message = "BT: No efficient path found"
+                    step_budget_limit = 10  # Evaluates best paths up to 10 moves deep
+                    search_result = plan_path_backtracking(
+                        start_pos=current_game_state["player_pos"],
+                        step_limit=step_budget_limit,
+                        item_list=current_game_state["treasures"]
+                    )
+                    
+                    calculated_route = search_result["calculated_path"]
+                    
+                    if len(calculated_route) > 1:
+                        active_log_message = f"BT planned: {len(calculated_route)-1} steps"
+                        _current_backtracking_route = calculated_route
+                        Bridge.save_user_action("RUN_BACKTRACKING", {
+                            "planned_path": calculated_route,
+                            "total_steps": len(calculated_route) - 1,
+                            "projected_yield": search_result["total_yield"]
+                        })
+                    else:
+                        active_log_message = "BT: No efficient path found"
+                        _current_backtracking_route = []
 
     # Swap visual pipeline memory frames
     pygame.display.flip()

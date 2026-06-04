@@ -154,6 +154,7 @@ def _init_default_state():
             {"id": 4, "value": 50, "row": 5, "col": 4, "name": "Emerald Ring", "collected": False}
         ],
         "traps": [],
+        "backtracking_remaining": 5,
         "bst_height": 0,
         "bst_node_count": 4,
         "uncollected_count": 4,
@@ -244,7 +245,16 @@ def _process_action_locally(action):
             state["message"] = f"Best target: \"{best.get('name')}\" value={best.get('value')} at ({best.get('row')},{best.get('col')}), manhattan dist={dist}."
 
     elif action_type == "run_backtracking":
-        state["message"] = "Backtracking is not available in the local fallback engine."
+        remaining = state.get("backtracking_remaining", 5)
+        if remaining <= 0:
+            state["message"] = "No backtracking uses left."
+        else:
+            state["backtracking_remaining"] = remaining - 1
+            path = action.get("planned_path")
+            if path and len(path) > 1:
+                state["message"] = f"Backtracking used. Route length: {len(path)-1} steps. Uses left: {state['backtracking_remaining']}"
+            else:
+                state["message"] = f"Backtracking used. Uses left: {state['backtracking_remaining']}"
 
     elif action_type == "init":
         state = {
@@ -260,6 +270,8 @@ def _process_action_locally(action):
             "grid_cols": action.get("grid_cols", DEFAULT_GRID_COLS),
             "walls": action.get("walls", []),
             "treasures": [{**t, "collected": False} for t in action.get("treasures", [])],
+            "traps": [],
+            "backtracking_remaining": action.get("backtracking_remaining", 5),
             "bst_height": 0,
             "bst_node_count": len(action.get("treasures", [])),
             "uncollected_count": len(action.get("treasures", [])),
@@ -317,6 +329,7 @@ def _convert_for_ui(state):
             }
             for p in state.get("traps", [])
         ],
+        "backtracking_remaining": state.get("backtracking_remaining", 5),
         "grid_rows": state.get("grid_rows", DEFAULT_GRID_ROWS),
         "grid_cols": state.get("grid_cols", DEFAULT_GRID_COLS)
     }
