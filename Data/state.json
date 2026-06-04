@@ -1,12 +1,12 @@
 {
-    "player_row": 4,
-    "player_col": 2,
-    "steps_taken": 36,
+    "player_row": 1,
+    "player_col": 0,
+    "steps_taken": 1,
     "step_limit": 40,
-    "score": 320,
+    "score": 0,
     "game_over": false,
     "player_won": false,
-    "message": "Moved up to (4,2). Steps: 36 / 40. Collected \"Coin 7\" (+10 pts)! New treasure spawned at (6,1).",
+    "message": "Moved down to (1,0). Steps: 1 / 40.",
     "grid_rows": 8,
     "grid_cols": 8,
     "walls": [],
@@ -17,7 +17,7 @@
             "row": 1,
             "col": 3,
             "name": "Bronze Chest",
-            "collected": true
+            "collected": false
         },
         {
             "id": 2,
@@ -25,7 +25,7 @@
             "row": 2,
             "col": 5,
             "name": "Silver Crown",
-            "collected": true
+            "collected": false
         },
         {
             "id": 3,
@@ -33,7 +33,7 @@
             "row": 4,
             "col": 1,
             "name": "Golden Chalice",
-            "collected": true
+            "collected": false
         },
         {
             "id": 4,
@@ -41,78 +41,15 @@
             "row": 5,
             "col": 4,
             "name": "Emerald Ring",
-            "collected": true
-        },
-        {
-            "id": 5,
-            "value": 100,
-            "row": 2,
-            "col": 6,
-            "name": "Coin 5",
-            "collected": true
-        },
-        {
-            "id": 6,
-            "value": 50,
-            "row": 0,
-            "col": 1,
-            "name": "Coin 6",
-            "collected": false
-        },
-        {
-            "id": 7,
-            "value": 10,
-            "row": 4,
-            "col": 2,
-            "name": "Coin 7",
-            "collected": true
-        },
-        {
-            "id": 8,
-            "value": 10,
-            "row": 4,
-            "col": 5,
-            "name": "Coin 8",
-            "collected": false
-        },
-        {
-            "id": 9,
-            "value": 100,
-            "row": 2,
-            "col": 2,
-            "name": "Coin 9",
-            "collected": false
-        },
-        {
-            "id": 10,
-            "value": 50,
-            "row": 6,
-            "col": 1,
-            "name": "Coin 10",
             "collected": false
         }
     ],
-    "traps": [
-        {
-            "id": 1,
-            "row": 7,
-            "col": 5,
-            "name": "Spike 1",
-            "triggered": false
-        },
-        {
-            "id": 2,
-            "row": 1,
-            "col": 7,
-            "name": "Spike 2",
-            "triggered": false
-        }
-    ],
-    "backtracking_remaining": 2,
+    "traps": [],
+    "backtracking_remaining": 5,
     "bst_height": 0,
-    "bst_node_count": 10,
+    "bst_node_count": 4,
     "uncollected_count": 4,
-    "history_length": 36,
+    "history_length": 1,
     "greedy_target": null,
     "movement_history": [
         "START"
