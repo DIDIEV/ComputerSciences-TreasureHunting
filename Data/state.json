@@ -136,6 +136,20 @@
             "col": 2,
             "name": "Spike 12",
             "triggered": false
+        },
+        {
+            "id": 13,
+            "row": 5,
+            "col": 2,
+            "name": "Spike 13",
+            "triggered": false
+        },
+        {
+            "id": 14,
+            "row": 0,
+            "col": 4,
+            "name": "Spike 14",
+            "triggered": false
         }
     ],
     "bst_height": 0,
