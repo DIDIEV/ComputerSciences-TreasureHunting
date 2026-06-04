@@ -1,0 +1,20 @@
+{
+  "init": true,
+  "player_row": 0,
+  "player_col": 0,
+  "steps_taken": 0,
+  "step_limit": 40,
+  "score": 0,
+  "game_over": false,
+  "player_won": false,
+  "message": "Waiting for engine first run.",
+  "grid_rows": 10,
+  "grid_cols": 10,
+  "walls": [],
+  "treasures": [],
+  "bst_height": 0,
+  "bst_node_count": 0,
+  "uncollected_count": 0,
+  "history_length": 0,
+  "greedy_target": null
+}
