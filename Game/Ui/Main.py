@@ -40,7 +40,9 @@ frame_clock = pygame.time.Clock()
 COLOR_BG = (24, 24, 27)         # Slate-900 background dark theme
 COLOR_GRID = (39, 39, 42)       # Slate-800 grid board lines
 COLOR_PLAYER = (59, 130, 246)   # Blue-500 interactive agent block
-COLOR_TREASURE = (234, 179, 8)  # Yellow-500 item circle representation
+COLOR_TREASURE_LOW = (52, 211, 153)   # Green-400 low-value treasure
+COLOR_TREASURE_MEDIUM = (234, 179, 8) # Yellow-500 medium-value treasure
+COLOR_TREASURE_HIGH = (239, 68, 68)   # Red-500 high-value treasure
 COLOR_TEXT = (244, 244, 245)    # Zinc-100 high contrast layout text
 COLOR_HUD_BG = (39, 39, 42)     # Sidebar contrast container panel
 COLOR_TRAP = (220, 38, 38)     # Red-600 trap color
@@ -49,6 +51,14 @@ COLOR_TRAP = (220, 38, 38)     # Red-600 trap color
 TRAP_SPAWN_INTERVAL = getattr(Bridge, 'TRAP_SPAWN_INTERVAL', 20)
 _trap = None
 _last_trap_spawn = time.time()
+
+
+def treasure_color_by_value(value: int):
+    if value <= 20:
+        return COLOR_TREASURE_LOW
+    if value <= 60:
+        return COLOR_TREASURE_MEDIUM
+    return COLOR_TREASURE_HIGH
 
 def draw_matrix_board(rows: int, cols: int):
     """
@@ -80,7 +90,7 @@ def draw_sidebar_hud(game_state, message=""):
     pygame.draw.rect(screen, COLOR_HUD_BG, hud_rect)
     
     # Title display
-    title_surface = font_header.render("TREASURE HUNT (V7)", True, COLOR_TREASURE)
+    title_surface = font_header.render("TREASURE HUNT (V7)", True, COLOR_TREASURE_MEDIUM)
     screen.blit(title_surface, (board_width + 20, 20))
     
     # Active simulation data outputs
@@ -107,7 +117,7 @@ def draw_sidebar_hud(game_state, message=""):
     arrow_txt = font_small.render("- ARROW KEYS: Manual Step Move", True, COLOR_TEXT)
     screen.blit(arrow_txt, (board_width + 20, 210))
     
-    greedy_txt = font_small.render("- 'G' KEY: Execute Greedy Target", True, COLOR_TREASURE)
+    greedy_txt = font_small.render("- 'G' KEY: Execute Greedy Target", True, COLOR_TREASURE_MEDIUM)
     screen.blit(greedy_txt, (board_width + 20, 235))
     
     bt_txt = font_small.render("- 'B' KEY: Run Backtracking (Max 10)", True, COLOR_PLAYER)
@@ -115,7 +125,7 @@ def draw_sidebar_hud(game_state, message=""):
 
     # Real-time algorithm logging monitor
     if message:
-        log_title = font_header.render("ENGINE LOG:", True, COLOR_TREASURE)
+        log_title = font_header.render("ENGINE LOG:", True, COLOR_TREASURE_MEDIUM)
         screen.blit(log_title, (board_width + 20, 310))
         log_surface = font_small.render(message, True, COLOR_TEXT)
         screen.blit(log_surface, (board_width + 20, 340))
@@ -159,9 +169,10 @@ while application_active:
         tx, ty = treasure["x"], treasure["y"]
         if not (0 <= tx < board_cols and 0 <= ty < board_rows):
             continue
-        # Center-fit circles inside grid cells
+        # Choose color by value tier
+        color = treasure_color_by_value(treasure.get("value", 0))
         treasure_bounds = pygame.Rect(tx * CELL_SIZE + 15, ty * CELL_SIZE + 15, CELL_SIZE - 30, CELL_SIZE - 30)
-        pygame.draw.ellipse(screen, COLOR_TREASURE, treasure_bounds)
+        pygame.draw.ellipse(screen, color, treasure_bounds)
         
     # Draw traps (if any)
     for trap in current_game_state.get("traps", []):

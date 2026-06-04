@@ -59,7 +59,8 @@ def _spawn_random_treasure(state):
     if state.get("treasures"):
         next_id = max((t.get("id", 0) for t in state["treasures"]), default=0) + 1
 
-    value = random.choice([10, 20, 30, 50, 75, 100])
+    # Use three distinct treasure values for clearer greedy choices
+    value = random.choice([10, 50, 100])
     treasure = {
         "id": next_id,
         "value": value,
@@ -147,10 +148,10 @@ def _init_default_state():
         "grid_cols": DEFAULT_GRID_COLS,
         "walls": [],
         "treasures": [
-            {"id": 1, "value": 100, "row": 1, "col": 3, "name": "Bronze Chest", "collected": False},
-            {"id": 2, "value": 250, "row": 2, "col": 5, "name": "Silver Crown", "collected": False},
-            {"id": 3, "value": 450, "row": 4, "col": 1, "name": "Golden Chalice", "collected": False},
-            {"id": 4, "value": 300, "row": 5, "col": 4, "name": "Emerald Ring", "collected": False}
+            {"id": 1, "value": 10, "row": 1, "col": 3, "name": "Bronze Chest", "collected": False},
+            {"id": 2, "value": 50, "row": 2, "col": 5, "name": "Silver Crown", "collected": False},
+            {"id": 3, "value": 100, "row": 4, "col": 1, "name": "Golden Chalice", "collected": False},
+            {"id": 4, "value": 50, "row": 5, "col": 4, "name": "Emerald Ring", "collected": False}
         ],
         "traps": [],
         "bst_height": 0,
