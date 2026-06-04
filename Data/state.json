@@ -1,12 +1,12 @@
 {
-    "player_row": 1,
-    "player_col": 1,
-    "steps_taken": 30,
+    "player_row": 7,
+    "player_col": 7,
+    "steps_taken": 49,
     "step_limit": 40,
-    "score": 800,
-    "game_over": false,
+    "score": 1120,
+    "game_over": true,
     "player_won": false,
-    "message": "Moved up to (1,1). Steps: 30 / 40.",
+    "message": "Step limit reached (40 steps). Game Over. Score: 1120.",
     "grid_rows": 10,
     "grid_cols": 10,
     "walls": [],
@@ -41,13 +41,53 @@
             "row": 7,
             "col": 8,
             "name": "Emerald Ring",
+            "collected": true
+        },
+        {
+            "id": 5,
+            "value": 75,
+            "row": 8,
+            "col": 1,
+            "name": "Coin 5",
+            "collected": false
+        },
+        {
+            "id": 6,
+            "value": 100,
+            "row": 9,
+            "col": 3,
+            "name": "Coin 6",
+            "collected": false
+        },
+        {
+            "id": 7,
+            "value": 20,
+            "row": 0,
+            "col": 5,
+            "name": "Coin 7",
+            "collected": true
+        },
+        {
+            "id": 8,
+            "value": 30,
+            "row": 7,
+            "col": 3,
+            "name": "Coin 8",
+            "collected": false
+        },
+        {
+            "id": 9,
+            "value": 100,
+            "row": 3,
+            "col": 5,
+            "name": "Coin 9",
             "collected": false
         }
     ],
     "bst_height": 0,
-    "bst_node_count": 4,
+    "bst_node_count": 9,
     "uncollected_count": 4,
-    "history_length": 0,
+    "history_length": 49,
     "greedy_target": null,
     "movement_history": [
         "START"

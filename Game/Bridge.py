@@ -8,6 +8,7 @@ COMPONENT: INTERACTIVE PYGAME USER INTERFACE
 
 import json
 import os
+import random
 import subprocess
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,6 +33,49 @@ def _write_json(path, payload):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(payload, f, indent=4)
+
+
+def _spawn_random_treasure(state):
+    max_rows = state.get("grid_rows", DEFAULT_GRID_ROWS)
+    max_cols = state.get("grid_cols", DEFAULT_GRID_COLS)
+    occupied = {
+        (state.get("player_row", 0), state.get("player_col", 0))
+    }
+    occupied.update({(w.get("row"), w.get("col")) for w in state.get("walls", [])})
+    occupied.update({(t.get("row"), t.get("col")) for t in state.get("treasures", []) if not t.get("collected", False)})
+
+    free_positions = [
+        (r, c)
+        for r in range(max_rows)
+        for c in range(max_cols)
+        if (r, c) not in occupied
+    ]
+    if not free_positions:
+        return None
+
+    row, col = random.choice(free_positions)
+    next_id = 1
+    if state.get("treasures"):
+        next_id = max((t.get("id", 0) for t in state["treasures"]), default=0) + 1
+
+    value = random.choice([10, 20, 30, 50, 75, 100])
+    treasure = {
+        "id": next_id,
+        "value": value,
+        "row": row,
+        "col": col,
+        "name": f"Coin {next_id}",
+        "collected": False
+    }
+    state["treasures"].append(treasure)
+    return treasure
+
+
+def _update_state_counts(state):
+    treasures = state.get("treasures", [])
+    state["bst_node_count"] = len(treasures)
+    state["uncollected_count"] = len([t for t in treasures if not t.get("collected", False)])
+    state["history_length"] = state.get("steps_taken", 0)
 
 
 def _build_engine_payload(action_type, details=None):
@@ -126,6 +170,11 @@ def _process_action_locally(action):
                 collected_message = f" Collected \"{treasure.get('name', 'Treasure')}\" (+{treasure.get('value', 0)} pts)!"
                 break
 
+        if collected_message:
+            new_treasure = _spawn_random_treasure(state)
+            if new_treasure is not None:
+                collected_message += f" New treasure spawned at ({new_treasure['row']},{new_treasure['col']})."
+
         if state.get("treasures") and all(t.get("collected", False) for t in state.get("treasures", [])):
             state["game_over"] = True
             state["player_won"] = True
@@ -177,6 +226,7 @@ def _process_action_locally(action):
         state["message"] = f"Unknown action type: {action_type}"
 
     state["init"] = False
+    _update_state_counts(state)
     _write_json(STATE_PATH, state)
 
 
