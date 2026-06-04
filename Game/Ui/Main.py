@@ -52,7 +52,6 @@ COLOR_BACKTRACK_ROUTE = (16, 185, 129)
 TRAP_SPAWN_INTERVAL = getattr(Bridge, 'TRAP_SPAWN_INTERVAL', 20)
 _trap = None
 _last_trap_spawn = time.time()
-_current_backtracking_route = []
 BACKTRACKING_MAX_USES = 5
 
 
@@ -127,7 +126,7 @@ def draw_sidebar_hud(game_state, message=""):
     greedy_txt = font_small.render("- 'G' KEY: Execute Greedy Target", True, COLOR_TREASURE_MEDIUM)
     screen.blit(greedy_txt, (board_width + 20, 235))
     
-    bt_txt = font_small.render(f"- 'B' KEY: Run Backtracking (Max {BACKTRACKING_MAX_USES})", True, COLOR_PLAYER)
+    bt_txt = font_small.render(f"- 'B' KEY: Run Backtracking (Max {BACKTRACKING_MAX_USES} uses)", True, COLOR_PLAYER)
     screen.blit(bt_txt, (board_width + 20, 260))
 
     # Real-time algorithm logging monitor
@@ -173,8 +172,8 @@ while application_active:
     # 2. Render Board Entities: Render structural states fetched from memory representations
     # Drawing target treasure matrices elements
     # Draw backtracking route overlay if available
-    for route_cell in _current_backtracking_route:
-        rx, ry = route_cell
+    for route_cell in current_game_state.get("backtracking_route", []):
+        rx, ry = route_cell.get("x", 0), route_cell.get("y", 0)
         if not (0 <= rx < board_cols and 0 <= ry < board_rows):
             continue
         route_rect = pygame.Rect(rx * CELL_SIZE + 22, ry * CELL_SIZE + 22, CELL_SIZE - 44, CELL_SIZE - 44)
@@ -232,19 +231,15 @@ while application_active:
             if event.key == pygame.K_UP:
                 Bridge.save_user_action("MOVE", {"dir": "UP"})
                 active_log_message = "Manual action: Move UP"
-                _current_backtracking_route = []
             elif event.key == pygame.K_DOWN:
                 Bridge.save_user_action("MOVE", {"dir": "DOWN"})
                 active_log_message = "Manual action: Move DOWN"
-                _current_backtracking_route = []
             elif event.key == pygame.K_LEFT:
                 Bridge.save_user_action("MOVE", {"dir": "LEFT"})
                 active_log_message = "Manual action: Move LEFT"
-                _current_backtracking_route = []
             elif event.key == pygame.K_RIGHT:
                 Bridge.save_user_action("MOVE", {"dir": "RIGHT"})
                 active_log_message = "Manual action: Move RIGHT"
-                _current_backtracking_route = []
                 
             # Key 'G': Executes Greedy Optimization Method Search
             elif event.key == pygame.K_g:
@@ -262,14 +257,12 @@ while application_active:
                     })
                 else:
                     active_log_message = "Greedy: No items left"
-                _current_backtracking_route = []
                     
             # Key 'B': Executes Depth-Limited State Space Backtracking Search
             elif event.key == pygame.K_b:
                 remaining_backtracking = current_game_state.get("backtracking_remaining", BACKTRACKING_MAX_USES)
                 if remaining_backtracking <= 0:
                     active_log_message = "No backtracking uses left."
-                    _current_backtracking_route = []
                 else:
                     step_budget_limit = 10  # Evaluates best paths up to 10 moves deep
                     search_result = plan_path_backtracking(
@@ -282,7 +275,6 @@ while application_active:
                     
                     if len(calculated_route) > 1:
                         active_log_message = f"BT planned: {len(calculated_route)-1} steps"
-                        _current_backtracking_route = calculated_route
                         Bridge.save_user_action("RUN_BACKTRACKING", {
                             "planned_path": calculated_route,
                             "total_steps": len(calculated_route) - 1,
@@ -290,7 +282,6 @@ while application_active:
                         })
                     else:
                         active_log_message = "BT: No efficient path found"
-                        _current_backtracking_route = []
 
     # Swap visual pipeline memory frames
     pygame.display.flip()

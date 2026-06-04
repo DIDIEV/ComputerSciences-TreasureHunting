@@ -129,7 +129,8 @@ def _build_engine_payload(action_type, details=None):
     if action_type == "RUN_BACKTRACKING":
         return {
             "type": "run_backtracking",
-            "step_limit": details.get("step_limit", 10)
+            "step_limit": details.get("step_limit", 10),
+            "planned_path": details.get("planned_path", [])
         }
     return None
 
@@ -155,6 +156,7 @@ def _init_default_state():
         ],
         "traps": [],
         "backtracking_remaining": 5,
+        "backtracking_route": [],
         "bst_height": 0,
         "bst_node_count": 4,
         "uncollected_count": 4,
@@ -235,6 +237,7 @@ def _process_action_locally(action):
 
     elif action_type == "query_best_treasure":
         treasures = [t for t in state.get("treasures", []) if not t.get("collected", False)]
+        state["backtracking_route"] = []
         if not treasures:
             state["message"] = "No uncollected treasures remaining."
         else:
@@ -248,12 +251,18 @@ def _process_action_locally(action):
         remaining = state.get("backtracking_remaining", 5)
         if remaining <= 0:
             state["message"] = "No backtracking uses left."
+            state["backtracking_route"] = []
         else:
             state["backtracking_remaining"] = remaining - 1
-            path = action.get("planned_path")
-            if path and len(path) > 1:
+            path = action.get("planned_path") or []
+            if len(path) > 1:
+                state["backtracking_route"] = [
+                    {"x": p[0], "y": p[1]} if isinstance(p, tuple) else {"x": p.get("x", 0), "y": p.get("y", 0)}
+                    for p in path
+                ]
                 state["message"] = f"Backtracking used. Route length: {len(path)-1} steps. Uses left: {state['backtracking_remaining']}"
             else:
+                state["backtracking_route"] = []
                 state["message"] = f"Backtracking used. Uses left: {state['backtracking_remaining']}"
 
     elif action_type == "init":
@@ -272,6 +281,7 @@ def _process_action_locally(action):
             "treasures": [{**t, "collected": False} for t in action.get("treasures", [])],
             "traps": [],
             "backtracking_remaining": action.get("backtracking_remaining", 5),
+            "backtracking_route": [],
             "bst_height": 0,
             "bst_node_count": len(action.get("treasures", [])),
             "uncollected_count": len(action.get("treasures", [])),
@@ -330,6 +340,10 @@ def _convert_for_ui(state):
             for p in state.get("traps", [])
         ],
         "backtracking_remaining": state.get("backtracking_remaining", 5),
+        "backtracking_route": [
+            {"x": p.get("x", 0), "y": p.get("y", 0)}
+            for p in state.get("backtracking_route", [])
+        ],
         "grid_rows": state.get("grid_rows", DEFAULT_GRID_ROWS),
         "grid_cols": state.get("grid_cols", DEFAULT_GRID_COLS)
     }
