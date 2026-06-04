@@ -1,23 +1,4 @@
 {
-  "type": "init",
-  "player_row": 0,
-  "player_col": 0,
-  "step_limit": 40,
-  "walls": [
-    { "row": 2, "col": 3 },
-    { "row": 2, "col": 4 },
-    { "row": 2, "col": 5 },
-    { "row": 5, "col": 1 },
-    { "row": 5, "col": 2 },
-    { "row": 7, "col": 6 },
-    { "row": 7, "col": 7 }
-  ],
-  "treasures": [
-    { "id": 1, "value": 10, "row": 1, "col": 4, "name": "Silver Coin" },
-    { "id": 2, "value": 25, "row": 3, "col": 7, "name": "Gold Bar"    },
-    { "id": 3, "value": 50, "row": 6, "col": 2, "name": "Ruby Gem"    },
-    { "id": 4, "value": 75, "row": 8, "col": 9, "name": "Diamond"     },
-    { "id": 5, "value": 5,  "row": 0, "col": 6, "name": "Bronze Ring" },
-    { "id": 6, "value": 40, "row": 9, "col": 0, "name": "Emerald"     }
-  ]
+    "type": "move",
+    "direction": "up"
 }

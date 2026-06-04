@@ -24,7 +24,7 @@ pygame.init()
 
 # Viewport spatial definitions (Constraint: Matrix grid layout must be at least 8x8)
 CELL_SIZE = 60
-GRID_SIZE = 8
+GRID_SIZE = 10
 HUD_WIDTH = 260
 WINDOW_WIDTH = (GRID_SIZE * CELL_SIZE) + HUD_WIDTH
 WINDOW_HEIGHT = GRID_SIZE * CELL_SIZE

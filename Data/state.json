@@ -1,20 +1,56 @@
 {
-  "init": true,
-  "player_row": 0,
-  "player_col": 0,
-  "steps_taken": 0,
-  "step_limit": 40,
-  "score": 0,
-  "game_over": false,
-  "player_won": false,
-  "message": "Waiting for engine first run.",
-  "grid_rows": 10,
-  "grid_cols": 10,
-  "walls": [],
-  "treasures": [],
-  "bst_height": 0,
-  "bst_node_count": 0,
-  "uncollected_count": 0,
-  "history_length": 0,
-  "greedy_target": null
+    "player_row": 1,
+    "player_col": 1,
+    "steps_taken": 30,
+    "step_limit": 40,
+    "score": 800,
+    "game_over": false,
+    "player_won": false,
+    "message": "Moved up to (1,1). Steps: 30 / 40.",
+    "grid_rows": 10,
+    "grid_cols": 10,
+    "walls": [],
+    "treasures": [
+        {
+            "id": 1,
+            "value": 100,
+            "row": 1,
+            "col": 3,
+            "name": "Bronze Chest",
+            "collected": true
+        },
+        {
+            "id": 2,
+            "value": 250,
+            "row": 2,
+            "col": 6,
+            "name": "Silver Crown",
+            "collected": true
+        },
+        {
+            "id": 3,
+            "value": 450,
+            "row": 4,
+            "col": 1,
+            "name": "Golden Chalice",
+            "collected": true
+        },
+        {
+            "id": 4,
+            "value": 300,
+            "row": 7,
+            "col": 8,
+            "name": "Emerald Ring",
+            "collected": false
+        }
+    ],
+    "bst_height": 0,
+    "bst_node_count": 4,
+    "uncollected_count": 4,
+    "history_length": 0,
+    "greedy_target": null,
+    "movement_history": [
+        "START"
+    ],
+    "init": false
 }
