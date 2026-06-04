@@ -9,6 +9,9 @@ COMPONENT: INTERACTIVE PYGAME USER INTERFACE
 import os
 import sys
 import pygame
+import random
+import time
+import json
 
 # Dynamic path injection to safely import Bridge and algorithms across parent packages
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +43,12 @@ COLOR_PLAYER = (59, 130, 246)   # Blue-500 interactive agent block
 COLOR_TREASURE = (234, 179, 8)  # Yellow-500 item circle representation
 COLOR_TEXT = (244, 244, 245)    # Zinc-100 high contrast layout text
 COLOR_HUD_BG = (39, 39, 42)     # Sidebar contrast container panel
+COLOR_TRAP = (220, 38, 38)     # Red-600 trap color
+
+# Trap spawn timing (use Bridge constant when available)
+TRAP_SPAWN_INTERVAL = getattr(Bridge, 'TRAP_SPAWN_INTERVAL', 20)
+_trap = None
+_last_trap_spawn = time.time()
 
 def draw_matrix_board(rows: int, cols: int):
     """
@@ -86,6 +95,10 @@ def draw_sidebar_hud(game_state, message=""):
     items_text = f"Items Remaining: {len(game_state['treasures'])}"
     items_surface = font_body.render(items_text, True, COLOR_TEXT)
     screen.blit(items_surface, (board_width + 20, 120))
+
+    traps_text = f"Traps Active: {len(game_state.get('traps', []))}"
+    traps_surface = font_body.render(traps_text, True, COLOR_TRAP)
+    screen.blit(traps_surface, (board_width + 20, 140))
     
     # Controls reference text block
     controls_title = font_header.render("CONTROLS:", True, COLOR_TEXT)
@@ -126,6 +139,18 @@ while application_active:
     if screen.get_size() != (board_width + HUD_WIDTH, board_height):
         screen = pygame.display.set_mode((board_width + HUD_WIDTH, board_height))
 
+    # Spawn a trap periodically using Bridge helper (fallback, persistent)
+    try:
+        if time.time() - _last_trap_spawn > TRAP_SPAWN_INTERVAL:
+            full_state = Bridge._load_json(Bridge.STATE_PATH) or Bridge._init_default_state()
+            new_trap = Bridge._spawn_random_trap(full_state)
+            if new_trap:
+                Bridge._write_json(Bridge.STATE_PATH, full_state)
+            _last_trap_spawn = time.time()
+    except Exception:
+        # If Bridge internals aren't available, skip spawn
+        pass
+
     draw_matrix_board(board_rows, board_cols)
     
     # 2. Render Board Entities: Render structural states fetched from memory representations
@@ -138,13 +163,35 @@ while application_active:
         treasure_bounds = pygame.Rect(tx * CELL_SIZE + 15, ty * CELL_SIZE + 15, CELL_SIZE - 30, CELL_SIZE - 30)
         pygame.draw.ellipse(screen, COLOR_TREASURE, treasure_bounds)
         
+    # Draw traps (if any)
+    for trap in current_game_state.get("traps", []):
+        tx, ty = trap.get("x", 0), trap.get("y", 0)
+        if not (0 <= tx < board_cols and 0 <= ty < board_rows):
+            continue
+        trap_rect = pygame.Rect(tx * CELL_SIZE + 18, ty * CELL_SIZE + 18, CELL_SIZE - 36, CELL_SIZE - 36)
+        pygame.draw.rect(screen, COLOR_TRAP, trap_rect)
+
     # Drawing active player agent positioning block
     px, py = current_game_state["player_pos"]
     px = max(0, min(px, board_cols - 1))
     py = max(0, min(py, board_rows - 1))
     player_bounds = pygame.Rect(px * CELL_SIZE + 10, py * CELL_SIZE + 10, CELL_SIZE - 20, CELL_SIZE - 20)
     pygame.draw.rect(screen, COLOR_PLAYER, player_bounds)
-    
+
+    # Check for trap collision (player stepped on a trap)
+    for trap in current_game_state.get("traps", []):
+        if trap.get("x") == px and trap.get("y") == py:
+            try:
+                new_state = Bridge._init_default_state()
+                new_state["message"] = "Trap triggered! Game reset."
+                Bridge._write_json(Bridge.STATE_PATH, new_state)
+                active_log_message = "TRAP! Game reset."
+            except Exception:
+                active_log_message = "TRAP! (reset failed)"
+            # Reload state for HUD display
+            current_game_state = Bridge.read_game_state()
+            break
+
     # Drawing auxiliary sidebar viewport
     draw_sidebar_hud(current_game_state, active_log_message)
     
@@ -213,3 +260,7 @@ while application_active:
 # Tear down subsystem contexts upon game loop interruption
 pygame.quit()
 sys.exit()
+
+
+
+

@@ -1,12 +1,12 @@
 {
-    "player_row": 3,
-    "player_col": 3,
-    "steps_taken": 138,
+    "player_row": 1,
+    "player_col": 1,
+    "steps_taken": 8,
     "step_limit": 40,
-    "score": 2550,
-    "game_over": true,
+    "score": 100,
+    "game_over": false,
     "player_won": false,
-    "message": "Step limit reached (40 steps). Game Over. Score: 2550. Collected \"Coin 36\" (+75 pts)! New treasure spawned at (5,5).",
+    "message": "Moved left to (1,1). Steps: 8 / 40.",
     "grid_rows": 8,
     "grid_cols": 8,
     "walls": [],
@@ -25,7 +25,7 @@
             "row": 2,
             "col": 5,
             "name": "Silver Crown",
-            "collected": true
+            "collected": false
         },
         {
             "id": 3,
@@ -33,7 +33,7 @@
             "row": 4,
             "col": 1,
             "name": "Golden Chalice",
-            "collected": true
+            "collected": false
         },
         {
             "id": 4,
@@ -41,301 +41,107 @@
             "row": 5,
             "col": 4,
             "name": "Emerald Ring",
-            "collected": true
+            "collected": false
         },
         {
             "id": 5,
             "value": 10,
-            "row": 4,
-            "col": 2,
+            "row": 0,
+            "col": 6,
             "name": "Coin 5",
-            "collected": true
-        },
-        {
-            "id": 6,
-            "value": 10,
-            "row": 0,
-            "col": 1,
-            "name": "Coin 6",
-            "collected": true
-        },
-        {
-            "id": 7,
-            "value": 10,
-            "row": 6,
-            "col": 0,
-            "name": "Coin 7",
-            "collected": true
-        },
-        {
-            "id": 8,
-            "value": 75,
-            "row": 0,
-            "col": 5,
-            "name": "Coin 8",
-            "collected": true
-        },
-        {
-            "id": 9,
-            "value": 10,
-            "row": 1,
-            "col": 5,
-            "name": "Coin 9",
-            "collected": true
-        },
-        {
-            "id": 10,
-            "value": 20,
-            "row": 4,
-            "col": 0,
-            "name": "Coin 10",
-            "collected": true
-        },
-        {
-            "id": 11,
-            "value": 100,
-            "row": 3,
-            "col": 2,
-            "name": "Coin 11",
-            "collected": true
-        },
-        {
-            "id": 12,
-            "value": 50,
-            "row": 4,
-            "col": 4,
-            "name": "Coin 12",
-            "collected": true
-        },
-        {
-            "id": 13,
-            "value": 20,
-            "row": 3,
-            "col": 6,
-            "name": "Coin 13",
-            "collected": true
-        },
-        {
-            "id": 14,
-            "value": 30,
-            "row": 6,
-            "col": 3,
-            "name": "Coin 14",
-            "collected": true
-        },
-        {
-            "id": 15,
-            "value": 50,
-            "row": 1,
-            "col": 5,
-            "name": "Coin 15",
-            "collected": true
-        },
-        {
-            "id": 16,
-            "value": 20,
-            "row": 0,
-            "col": 4,
-            "name": "Coin 16",
-            "collected": true
-        },
-        {
-            "id": 17,
-            "value": 100,
-            "row": 0,
-            "col": 6,
-            "name": "Coin 17",
-            "collected": true
-        },
-        {
-            "id": 18,
-            "value": 100,
-            "row": 1,
-            "col": 4,
-            "name": "Coin 18",
-            "collected": true
-        },
-        {
-            "id": 19,
-            "value": 10,
-            "row": 3,
-            "col": 2,
-            "name": "Coin 19",
-            "collected": true
-        },
-        {
-            "id": 20,
-            "value": 100,
-            "row": 2,
-            "col": 4,
-            "name": "Coin 20",
-            "collected": true
-        },
-        {
-            "id": 21,
-            "value": 50,
-            "row": 4,
-            "col": 4,
-            "name": "Coin 21",
-            "collected": true
-        },
-        {
-            "id": 22,
-            "value": 10,
-            "row": 5,
-            "col": 5,
-            "name": "Coin 22",
-            "collected": true
-        },
-        {
-            "id": 23,
-            "value": 20,
-            "row": 1,
-            "col": 0,
-            "name": "Coin 23",
-            "collected": true
-        },
-        {
-            "id": 24,
-            "value": 10,
-            "row": 2,
-            "col": 5,
-            "name": "Coin 24",
-            "collected": true
-        },
-        {
-            "id": 25,
-            "value": 100,
-            "row": 2,
-            "col": 0,
-            "name": "Coin 25",
-            "collected": true
-        },
-        {
-            "id": 26,
-            "value": 30,
-            "row": 6,
-            "col": 6,
-            "name": "Coin 26",
-            "collected": true
-        },
-        {
-            "id": 27,
-            "value": 75,
-            "row": 0,
-            "col": 3,
-            "name": "Coin 27",
-            "collected": true
-        },
-        {
-            "id": 28,
-            "value": 10,
-            "row": 1,
-            "col": 1,
-            "name": "Coin 28",
-            "collected": true
-        },
-        {
-            "id": 29,
-            "value": 75,
-            "row": 1,
-            "col": 2,
-            "name": "Coin 29",
-            "collected": true
-        },
-        {
-            "id": 30,
-            "value": 100,
-            "row": 5,
-            "col": 0,
-            "name": "Coin 30",
-            "collected": true
-        },
-        {
-            "id": 31,
-            "value": 30,
-            "row": 6,
-            "col": 0,
-            "name": "Coin 31",
-            "collected": true
-        },
-        {
-            "id": 32,
-            "value": 20,
-            "row": 2,
-            "col": 2,
-            "name": "Coin 32",
-            "collected": true
-        },
-        {
-            "id": 33,
-            "value": 10,
-            "row": 1,
-            "col": 4,
-            "name": "Coin 33",
-            "collected": true
-        },
-        {
-            "id": 34,
-            "value": 100,
-            "row": 6,
-            "col": 3,
-            "name": "Coin 34",
-            "collected": true
-        },
-        {
-            "id": 35,
-            "value": 50,
-            "row": 1,
-            "col": 2,
-            "name": "Coin 35",
-            "collected": false
-        },
-        {
-            "id": 36,
-            "value": 75,
-            "row": 3,
-            "col": 3,
-            "name": "Coin 36",
-            "collected": true
-        },
-        {
-            "id": 37,
-            "value": 10,
-            "row": 1,
-            "col": 5,
-            "name": "Coin 37",
-            "collected": false
-        },
-        {
-            "id": 38,
-            "value": 20,
-            "row": 4,
-            "col": 1,
-            "name": "Coin 38",
-            "collected": true
-        },
-        {
-            "id": 39,
-            "value": 50,
-            "row": 6,
-            "col": 6,
-            "name": "Coin 39",
-            "collected": false
-        },
-        {
-            "id": 40,
-            "value": 10,
-            "row": 5,
-            "col": 5,
-            "name": "Coin 40",
             "collected": false
         }
     ],
+    "traps": [
+        {
+            "id": 1,
+            "row": 2,
+            "col": 4,
+            "name": "Spike 1",
+            "triggered": false
+        },
+        {
+            "id": 2,
+            "row": 3,
+            "col": 3,
+            "name": "Spike 2",
+            "triggered": false
+        },
+        {
+            "id": 3,
+            "row": 0,
+            "col": 1,
+            "name": "Spike 3",
+            "triggered": false
+        },
+        {
+            "id": 4,
+            "row": 5,
+            "col": 7,
+            "name": "Spike 4",
+            "triggered": false
+        },
+        {
+            "id": 5,
+            "row": 3,
+            "col": 7,
+            "name": "Spike 5",
+            "triggered": false
+        },
+        {
+            "id": 6,
+            "row": 4,
+            "col": 0,
+            "name": "Spike 6",
+            "triggered": false
+        },
+        {
+            "id": 7,
+            "row": 4,
+            "col": 5,
+            "name": "Spike 7",
+            "triggered": false
+        },
+        {
+            "id": 8,
+            "row": 0,
+            "col": 2,
+            "name": "Spike 8",
+            "triggered": false
+        },
+        {
+            "id": 9,
+            "row": 6,
+            "col": 2,
+            "name": "Spike 9",
+            "triggered": false
+        },
+        {
+            "id": 10,
+            "row": 1,
+            "col": 3,
+            "name": "Spike 10",
+            "triggered": false
+        },
+        {
+            "id": 11,
+            "row": 7,
+            "col": 0,
+            "name": "Spike 11",
+            "triggered": false
+        },
+        {
+            "id": 12,
+            "row": 4,
+            "col": 2,
+            "name": "Spike 12",
+            "triggered": false
+        }
+    ],
     "bst_height": 0,
-    "bst_node_count": 40,
+    "bst_node_count": 5,
     "uncollected_count": 4,
-    "history_length": 138,
+    "history_length": 8,
     "greedy_target": null,
     "movement_history": [
         "START"

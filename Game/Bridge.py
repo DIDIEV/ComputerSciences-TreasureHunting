@@ -18,6 +18,7 @@ INPUT_PATH = os.path.join(DATA_DIR, "input.json")
 STATE_PATH = os.path.join(DATA_DIR, "state.json")
 DEFAULT_GRID_ROWS = 8
 DEFAULT_GRID_COLS = 8
+TRAP_SPAWN_INTERVAL = 20  # spawn a trap every N steps (fallback)
 
 def _load_json(path):
     if not os.path.exists(path):
@@ -71,6 +72,41 @@ def _spawn_random_treasure(state):
     return treasure
 
 
+def _spawn_random_trap(state):
+    max_rows = state.get("grid_rows", DEFAULT_GRID_ROWS)
+    max_cols = state.get("grid_cols", DEFAULT_GRID_COLS)
+    occupied = {
+        (state.get("player_row", 0), state.get("player_col", 0))
+    }
+    occupied.update({(w.get("row"), w.get("col")) for w in state.get("walls", [])})
+    occupied.update({(t.get("row"), t.get("col")) for t in state.get("treasures", []) if not t.get("collected", False)})
+    occupied.update({(p.get("row"), p.get("col")) for p in state.get("traps", [])})
+
+    free_positions = [
+        (r, c)
+        for r in range(max_rows)
+        for c in range(max_cols)
+        if (r, c) not in occupied
+    ]
+    if not free_positions:
+        return None
+
+    row, col = random.choice(free_positions)
+    next_id = 1
+    if state.get("traps"):
+        next_id = max((t.get("id", 0) for t in state["traps"]), default=0) + 1
+
+    trap = {
+        "id": next_id,
+        "row": row,
+        "col": col,
+        "name": f"Spike {next_id}",
+        "triggered": False
+    }
+    state.setdefault("traps", []).append(trap)
+    return trap
+
+
 def _update_state_counts(state):
     treasures = state.get("treasures", [])
     state["bst_node_count"] = len(treasures)
@@ -112,10 +148,11 @@ def _init_default_state():
         "walls": [],
         "treasures": [
             {"id": 1, "value": 100, "row": 1, "col": 3, "name": "Bronze Chest", "collected": False},
-            {"id": 2, "value": 250, "row": 2, "col": 6, "name": "Silver Crown", "collected": False},
+            {"id": 2, "value": 250, "row": 2, "col": 5, "name": "Silver Crown", "collected": False},
             {"id": 3, "value": 450, "row": 4, "col": 1, "name": "Golden Chalice", "collected": False},
-            {"id": 4, "value": 300, "row": 7, "col": 8, "name": "Emerald Ring", "collected": False}
+            {"id": 4, "value": 300, "row": 5, "col": 4, "name": "Emerald Ring", "collected": False}
         ],
+        "traps": [],
         "bst_height": 0,
         "bst_node_count": 4,
         "uncollected_count": 4,
@@ -162,6 +199,14 @@ def _process_action_locally(action):
         state["player_row"] = row
         state["player_col"] = col
         state["steps_taken"] = state.get("steps_taken", 0) + 1
+        # Check for traps at the new location: trigger reset if found
+        for trap in state.get("traps", []):
+            if trap.get("row") == row and trap.get("col") == col:
+                # reset to default state
+                new_state = _init_default_state()
+                new_state["message"] = "Trap triggered! Game reset."
+                _write_json(STATE_PATH, new_state)
+                return
         collected_message = ""
         for treasure in state.get("treasures", []):
             if not treasure.get("collected", False) and treasure.get("row") == row and treasure.get("col") == col:
@@ -262,6 +307,14 @@ def _convert_for_ui(state):
             }
             for t in state.get("treasures", [])
             if not t.get("collected", False)
+        ],
+        "traps": [
+            {
+                "x": p.get("col", 0),
+                "y": p.get("row", 0),
+                "name": p.get("name", "Trap")
+            }
+            for p in state.get("traps", [])
         ],
         "grid_rows": state.get("grid_rows", DEFAULT_GRID_ROWS),
         "grid_cols": state.get("grid_cols", DEFAULT_GRID_COLS)

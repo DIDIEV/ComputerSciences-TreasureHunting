@@ -9,10 +9,60 @@ COMPONENT: INTERACTIVE PYGAME USER INTERFACE
 import os
 import sys
 import pygame
+import itertools
 
 # Dynamic path configuration to allow importing components located on parent directories
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import Bridge  
+import Bridge
+
+# --- Backtracking planner API ---
+def plan_path_backtracking(start_pos, step_limit, item_list):
+    """
+    Simple backtracking planner that selects an ordered subset of treasures to visit
+    within `step_limit` steps maximizing total collected value. Returns a dict with
+    keys: `calculated_path` (list of (x,y) tuples including start) and `total_yield`.
+    """
+    # Normalize items
+    items = [dict(x=i.get('x'), y=i.get('y'), value=i.get('value', 0), name=i.get('name')) for i in item_list]
+
+    def manhattan(a, b):
+        return abs(a[0]-b[0]) + abs(a[1]-b[1])
+
+    best_yield = 0
+    best_route = [tuple(start_pos)]
+
+    # Try all permutations of up to len(items) (prune by distance limit)
+    for r in range(1, len(items)+1):
+        for perm in itertools.permutations(items, r):
+            dist = 0
+            pos = tuple(start_pos)
+            total = 0
+            feasible = True
+            for it in perm:
+                target = (it['x'], it['y'])
+                dist += manhattan(pos, target)
+                pos = target
+                if dist > step_limit:
+                    feasible = False
+                    break
+                total += it['value']
+            if feasible and total > best_yield:
+                best_yield = total
+                # build path as straight-line moves between points
+                path = [tuple(start_pos)]
+                cur = tuple(start_pos)
+                for it in perm:
+                    tx, ty = it['x'], it['y']
+                    # move horizontally then vertically
+                    while cur[0] != tx:
+                        cur = (cur[0] + (1 if tx > cur[0] else -1), cur[1])
+                        path.append(cur)
+                    while cur[1] != ty:
+                        cur = (cur[0], cur[1] + (1 if ty > cur[1] else -1))
+                        path.append(cur)
+                best_route = path
+
+    return {"calculated_path": best_route, "total_yield": best_yield}
 
 # Initialize the framework context
 pygame.init()
@@ -61,51 +111,52 @@ def render_sidebar_hud(game_state):
     score_surface = font_body.render(f"Total Score: {game_state['score']}", True, COLOR_TEXT)
     screen.blit(score_surface, (GRID_SIZE * CELL_SIZE + 20, 90))
 
-# Initialize Application Execution Loop
-application_running = True
-while application_running:
-    screen.fill(COLOR_BG)
-    render_matrix_grid()
-    
-    # 1. Pull data updates from the interface data Bridge
-    active_state = Bridge.read_game_state()
-    
-    # 2. Render entity objects parsed from structural representations
-    # Draw active treasure coordinates
-    for item in active_state["treasures"]:
-        tx, ty = item["x"], item["y"]
-        item_bounds = pygame.Rect(tx * CELL_SIZE + 15, ty * CELL_SIZE + 15, CELL_SIZE - 30, CELL_SIZE - 30)
-        pygame.draw.ellipse(screen, COLOR_TREASURE, item_bounds)
-        
-    # Draw player node position
-    px, py = active_state["player_pos"]
-    agent_bounds = pygame.Rect(px * CELL_SIZE + 10, py * CELL_SIZE + 10, CELL_SIZE - 20, CELL_SIZE - 20)
-    pygame.draw.rect(screen, COLOR_PLAYER, agent_bounds)
-    
-    # Render auxiliary metadata interface
-    render_sidebar_hud(active_state)
-    
-    # 3. Intercept user events and execute tracking actions
-    for user_event in pygame.event.get():
-        if user_event.type == pygame.QUIT:
-            application_running = False
+if __name__ == "__main__":
+    # Initialize Application Execution Loop
+    application_running = True
+    while application_running:
+        screen.fill(COLOR_BG)
+        render_matrix_grid()
+
+        # 1. Pull data updates from the interface data Bridge
+        active_state = Bridge.read_game_state()
+
+        # 2. Render entity objects parsed from structural representations
+        # Draw active treasure coordinates
+        for item in active_state["treasures"]:
+            tx, ty = item["x"], item["y"]
+            item_bounds = pygame.Rect(tx * CELL_SIZE + 15, ty * CELL_SIZE + 15, CELL_SIZE - 30, CELL_SIZE - 30)
+            pygame.draw.ellipse(screen, COLOR_TREASURE, item_bounds)
             
-        elif user_event.type == pygame.KEYDOWN:
-            if user_event.key == pygame.K_UP:
-                Bridge.save_user_action("MOVE", {"dir": "UP"})
-            elif user_event.key == pygame.K_DOWN:
-                Bridge.save_user_action("MOVE", {"dir": "DOWN"})
-            elif user_event.key == pygame.K_LEFT:
-                Bridge.save_user_action("MOVE", {"dir": "LEFT"})
-            elif user_event.key == pygame.K_RIGHT:
-                Bridge.save_user_action("MOVE", {"dir": "RIGHT"})
-            elif user_event.key == pygame.K_g:
-                Bridge.save_user_action("RUN_GREEDY")
-            elif user_event.key == pygame.K_b:
-                Bridge.save_user_action("RUN_BACKTRACKING", {"step_limit": 10})
+        # Draw player node position
+        px, py = active_state["player_pos"]
+        agent_bounds = pygame.Rect(px * CELL_SIZE + 10, py * CELL_SIZE + 10, CELL_SIZE - 20, CELL_SIZE - 20)
+        pygame.draw.rect(screen, COLOR_PLAYER, agent_bounds)
+        
+        # Render auxiliary metadata interface
+        render_sidebar_hud(active_state)
+        
+        # 3. Intercept user events and execute tracking actions
+        for user_event in pygame.event.get():
+            if user_event.type == pygame.QUIT:
+                application_running = False
+                
+            elif user_event.type == pygame.KEYDOWN:
+                if user_event.key == pygame.K_UP:
+                    Bridge.save_user_action("MOVE", {"dir": "UP"})
+                elif user_event.key == pygame.K_DOWN:
+                    Bridge.save_user_action("MOVE", {"dir": "DOWN"})
+                elif user_event.key == pygame.K_LEFT:
+                    Bridge.save_user_action("MOVE", {"dir": "LEFT"})
+                elif user_event.key == pygame.K_RIGHT:
+                    Bridge.save_user_action("MOVE", {"dir": "RIGHT"})
+                elif user_event.key == pygame.K_g:
+                    Bridge.save_user_action("RUN_GREEDY")
+                elif user_event.key == pygame.K_b:
+                    Bridge.save_user_action("RUN_BACKTRACKING", {"step_limit": 10})
 
-    pygame.display.flip()
-    frame_tracker.tick(30) # Anchor processing speeds to 30 frames per second
+        pygame.display.flip()
+        frame_tracker.tick(30) # Anchor processing speeds to 30 frames per second
 
-pygame.quit()
-sys.exit()
+    pygame.quit()
+    sys.exit()
