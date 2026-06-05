@@ -1,12 +1,12 @@
 {
-    "player_row": 6,
-    "player_col": 4,
-    "steps_taken": 34,
+    "player_row": 4,
+    "player_col": 1,
+    "steps_taken": 27,
     "step_limit": 40,
-    "score": 560,
+    "score": 260,
     "game_over": false,
     "player_won": false,
-    "message": "Moved up to (6,4). Steps: 34 / 40.",
+    "message": "Moved up to (4,1). Steps: 27 / 40. Collected \"Golden Chalice\" (+100 pts)! New treasure spawned at (0,4).",
     "grid_rows": 8,
     "grid_cols": 8,
     "walls": [],
@@ -45,25 +45,25 @@
         },
         {
             "id": 5,
-            "value": 100,
-            "row": 2,
-            "col": 7,
+            "value": 50,
+            "row": 1,
+            "col": 0,
             "name": "Coin 5",
-            "collected": true
+            "collected": false
         },
         {
             "id": 6,
             "value": 50,
-            "row": 4,
-            "col": 0,
+            "row": 2,
+            "col": 3,
             "name": "Coin 6",
-            "collected": true
+            "collected": false
         },
         {
             "id": 7,
-            "value": 100,
-            "row": 3,
-            "col": 2,
+            "value": 50,
+            "row": 4,
+            "col": 6,
             "name": "Coin 7",
             "collected": true
         },
@@ -71,160 +71,58 @@
             "id": 8,
             "value": 10,
             "row": 2,
-            "col": 5,
+            "col": 1,
             "name": "Coin 8",
             "collected": false
         },
         {
             "id": 9,
-            "value": 100,
-            "row": 7,
+            "value": 50,
+            "row": 0,
             "col": 4,
             "name": "Coin 9",
-            "collected": true
-        },
-        {
-            "id": 10,
-            "value": 10,
-            "row": 1,
-            "col": 7,
-            "name": "Coin 10",
-            "collected": false
-        },
-        {
-            "id": 11,
-            "value": 10,
-            "row": 0,
-            "col": 1,
-            "name": "Coin 11",
-            "collected": false
-        },
-        {
-            "id": 12,
-            "value": 10,
-            "row": 4,
-            "col": 2,
-            "name": "Coin 12",
             "collected": false
         }
     ],
     "traps": [
         {
             "id": 1,
-            "row": 3,
-            "col": 6,
+            "row": 4,
+            "col": 3,
             "name": "Spike 1",
             "triggered": false
         },
         {
             "id": 2,
-            "row": 2,
-            "col": 3,
+            "row": 4,
+            "col": 2,
             "name": "Spike 2",
             "triggered": false
         },
         {
             "id": 3,
-            "row": 0,
-            "col": 7,
-            "name": "Spike 3",
-            "triggered": false
-        },
-        {
-            "id": 4,
-            "row": 7,
-            "col": 3,
-            "name": "Spike 4",
-            "triggered": false
-        },
-        {
-            "id": 5,
-            "row": 5,
-            "col": 5,
-            "name": "Spike 5",
-            "triggered": false
-        },
-        {
-            "id": 6,
-            "row": 6,
-            "col": 1,
-            "name": "Spike 6",
-            "triggered": false
-        },
-        {
-            "id": 7,
-            "row": 0,
-            "col": 2,
-            "name": "Spike 7",
-            "triggered": false
-        },
-        {
-            "id": 8,
-            "row": 6,
-            "col": 0,
-            "name": "Spike 8",
-            "triggered": false
-        },
-        {
-            "id": 9,
-            "row": 1,
-            "col": 0,
-            "name": "Spike 9",
-            "triggered": false
-        },
-        {
-            "id": 10,
             "row": 3,
-            "col": 5,
-            "name": "Spike 10",
-            "triggered": false
-        },
-        {
-            "id": 11,
-            "row": 2,
-            "col": 0,
-            "name": "Spike 11",
-            "triggered": false
-        },
-        {
-            "id": 12,
-            "row": 1,
             "col": 1,
-            "name": "Spike 12",
-            "triggered": false
-        },
-        {
-            "id": 13,
-            "row": 7,
-            "col": 4,
-            "name": "Spike 13",
+            "name": "Spike 3",
             "triggered": false
         }
     ],
-    "backtracking_remaining": 0,
+    "backtracking_remaining": 4,
     "backtracking_route": [
         {
-            "x": 0,
-            "y": 2
+            "x": 6,
+            "y": 6
         },
         {
-            "x": 1,
-            "y": 2
+            "x": 6,
+            "y": 5
         },
         {
-            "x": 1,
-            "y": 3
-        },
-        {
-            "x": 1,
+            "x": 6,
             "y": 4
         },
         {
-            "x": 2,
-            "y": 4
-        },
-        {
-            "x": 3,
+            "x": 5,
             "y": 4
         },
         {
@@ -232,22 +130,22 @@
             "y": 4
         },
         {
-            "x": 5,
+            "x": 3,
             "y": 4
         },
         {
-            "x": 5,
-            "y": 3
+            "x": 2,
+            "y": 4
         },
         {
-            "x": 5,
-            "y": 2
+            "x": 1,
+            "y": 4
         }
     ],
     "bst_height": 0,
-    "bst_node_count": 12,
+    "bst_node_count": 9,
     "uncollected_count": 4,
-    "history_length": 34,
+    "history_length": 27,
     "greedy_target": null,
     "movement_history": [
         "START"
